@@ -1,6 +1,8 @@
 package com.xiangmei.uthink.analysis;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -21,6 +23,7 @@ public class Consume {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private RedisService redisService = null; 
 	private MysqlService mysqlService = null;
+	private DecimalFormat df = new DecimalFormat("#.00");
 	public static String keyConsume = "global:month:201602:consume";
 	
 	public Consume() {
@@ -54,10 +57,11 @@ public class Consume {
 				JSONObject memberJson = mysqlService.getMemberInfo(member);
 				sb.append(i).append(",")
 				.append(member).append(",")
-				.append(redisService.zscore(keyConsume, member)).append(",")
+				.append(df.format(redisService.zscore(keyConsume, member))).append("元,")
 				.append(memberJson.get("name")).append(",")
 				.append(memberJson.get("mobile")).append("\n");
 			}
+			
 		} catch (Exception e) {
 			logger.error("member consume exception",e);
 		}
