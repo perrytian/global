@@ -41,7 +41,13 @@ public class Consume {
 		List<SaleRecord> saleList = mysqlService.getSalesRecorde();
 		for (int i = 0; i < saleList.size(); i++) {
 			SaleRecord saleRecord = saleList.get(i);
-			redisService.saleRedis(saleRecord.getMember(), saleRecord.getPaid());
+			if (null!=saleRecord.getMember()) {
+				logger.info("会员信息："+saleRecord.getMember());
+				redisService.saleRedis(saleRecord.getMember(), saleRecord.getPaid());
+			}else {
+				logger.info("会员信息为空");
+			}
+			
 		}
 	}
 	
@@ -60,6 +66,7 @@ public class Consume {
 				.append(df.format(redisService.zscore(keyConsume, member))).append("元,")
 				.append(memberJson.get("name")).append(",")
 				.append(memberJson.get("mobile")).append("\n");
+				i++;
 			}
 			
 		} catch (Exception e) {
