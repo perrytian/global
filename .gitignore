@@ -1,0 +1,4 @@
+# ignore some file
+*.class
+/bin/*
+
