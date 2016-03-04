@@ -14,7 +14,7 @@ import java.sql.Statement;
 public class MysqlConnection {
 	
 	//local mysql
-	private static String dbName = "uthink";
+	private static String dbName = "test";
 	private static String host = "127.0.0.1";
 	private static String port = "3306";
 	private static String username = "root";
