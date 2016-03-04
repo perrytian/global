@@ -6,15 +6,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.xiangmei.uthink.analysis.Consume;
 
 public class RedisService {
 	
-	private static Logger logger = LoggerFactory.getLogger(RedisService.class);
+	private static Logger logger = Logger.getLogger(RedisService.class);
 	private SimpleDateFormat sdfMinute = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 	private SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");
 	private RedisClient client = null;
@@ -26,7 +26,9 @@ public class RedisService {
 	}
 	
 	public void freeJedis(){
-		client.freeJedis();
+		if (client!=null) {
+			client.freeJedis();
+		}
 	}
 	
 	/**
@@ -187,6 +189,26 @@ public class RedisService {
 			logger.error("获取成员数值错误",e);
 		}
 		return res;
+	}
+	
+	
+	public void saleRedis(String member,String paid){
+		try {
+			client.zincrby(Consume.keyConsume, member, paid);
+		} catch (Exception e) {
+			logger.error("saleRedis exception:",e);
+		}
+		
+	}
+	
+	public Set<String> memberConsume(){
+		Set<String> set = null;
+		try {
+			set = client.zrevrange(Consume.keyConsume, 0, -1);
+		} catch (Exception e) {
+			logger.error("memberConsume exception:",e);
+		}
+		return set;
 	}
 	
 	public static void main(String[] args) {
