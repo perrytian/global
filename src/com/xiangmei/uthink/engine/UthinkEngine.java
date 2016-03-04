@@ -1,13 +1,12 @@
 package com.xiangmei.uthink.engine;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.xiangmei.uthink.timer.QuartzManager;
 
 public class UthinkEngine {
 
-	private static Logger logger = LoggerFactory.getLogger(UthinkEngine.class); 
+	private static Logger logger = Logger.getLogger(UthinkEngine.class); 
 	public static void main(String[] args) {
 		logger.info("添加SMS任务，每天九点执行");
 		QuartzManager.addJob("BirthdaySMS", "com.xiangmei.uthink.timer.QuarztJob", "0 0 9 * * ? *");

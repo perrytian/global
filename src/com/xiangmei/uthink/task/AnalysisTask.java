@@ -2,15 +2,14 @@ package com.xiangmei.uthink.task;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.xiangmei.uthink.analysis.Output;
 import com.xiangmei.uthink.analysis.SalesAnalysis;
 
 public class AnalysisTask {
 	
-	private static Logger logger = LoggerFactory.getLogger(AnalysisTask.class); 
+	private static Logger logger = Logger.getLogger(AnalysisTask.class); 
 	SalesAnalysis salesAnalysis = new SalesAnalysis();
 	
 	public void start() throws Exception{

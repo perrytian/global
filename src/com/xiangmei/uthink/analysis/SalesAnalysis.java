@@ -9,8 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson.JSONObject;
 import com.xiangmei.uthink.decoder.Decoder;
@@ -21,7 +20,7 @@ import com.xiangmei.uthink.util.MathUtil;
 
 public class SalesAnalysis {
 
-	private static Logger logger = LoggerFactory.getLogger(SalesAnalysis.class); 
+	private static Logger logger = Logger.getLogger(SalesAnalysis.class); 
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	private RedisService redisService = null; 

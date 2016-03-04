@@ -3,8 +3,7 @@ package com.xiangmei.uthink.task;
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.xiangmei.uthink.mysql.MysqlService;
 import com.xiangmei.uthink.object.Customer;
@@ -13,7 +12,7 @@ import com.xiangmei.uthink.util.SmsUtil;
 
 public class BirthdayTask {
 	
-	private static Logger logger = LoggerFactory.getLogger(BirthdayTask.class); 
+	private static Logger logger = Logger.getLogger(BirthdayTask.class); 
 
 	public void start() throws Exception{
 		logger.info("开始执行SMS定时任务");

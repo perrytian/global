@@ -6,12 +6,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+
 
 public class SmsUtil {
 	
-	private static Logger logger = LoggerFactory.getLogger(SmsUtil.class); 
+	private static Logger logger = Logger.getLogger(SmsUtil.class); 
 
 	/**
 	 * @param args
