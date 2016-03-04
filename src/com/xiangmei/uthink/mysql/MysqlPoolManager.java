@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -136,13 +137,13 @@ public class MysqlPoolManager {
 		try {
 
 			HikariConfig config = new HikariConfig();
-			config.setMaximumPoolSize(50);
+			config.setMaximumPoolSize(10);
 			String name = "mysql";
 			config.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-			config.addDataSourceProperty("serverName", "192.168.1.1");
+			config.addDataSourceProperty("serverName", "localhost");
 			config.addDataSourceProperty("port", "3306");
 			config.addDataSourceProperty("databaseName", "test");
-			config.addDataSourceProperty("user", "test");
+			config.addDataSourceProperty("user", "root");
 			config.addDataSourceProperty("password", "test");
 			String connectionTestQuery = "select 1 from user";
 			config.addDataSourceProperty("useUnicode", "true");
@@ -179,9 +180,9 @@ public class MysqlPoolManager {
          String NO ="2012001";
          try {
                   
-            conn = MysqlPoolManager.getInstance().getConnection(dbname);             
+            conn = MysqlPoolManager.getInstance().getConnection("mysql");             
             StringBuffer sb1 = new StringBuffer();
-            sb1.append("SELECT name FROM student WHERE NO ='2012001'");
+            sb1.append("SELECT * FROM USER  WHERE ID ='1'");
 			String tsql = sb1 .toString();
             logger.info("tsql1 " + tsql);
 
@@ -190,8 +191,9 @@ public class MysqlPoolManager {
             long t_start_time1 = System.currentTimeMillis();
             rs = st.executeQuery(tsql);
             while (rs.next()) {
-            String name = rs.getString("name");
-            logger.info("姓名:"+name+",编号为 " + NO);
+            String name = rs.getString("USER_ID");
+            logger.info("姓名:"+name);
+            System.out.println("姓名:"+name);
                 }
 
 
