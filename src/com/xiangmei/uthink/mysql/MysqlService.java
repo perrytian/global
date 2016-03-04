@@ -139,7 +139,7 @@ public class MysqlService {
 		try {
 			String saleRecordeSql = "SELECT * FROM SALES_RECORDE";
 			//String saleRecordeSql = "select * from sales_recorde where id = '1'";
-			conn = MysqlConnection.getConnection();
+			conn = MysqlPoolManager.getInstance().getConnection("mysql"); 
 			stat = conn.createStatement();
 			rs = stat.executeQuery(saleRecordeSql);
 			while(rs.next()){
@@ -189,7 +189,15 @@ public class MysqlService {
 			logger.info("获取销售记录异常",e);
 		} finally {
 			try {
-				MysqlConnection.releaseResources(conn, stat, rs);
+				MysqlPoolManager.getInstance().freeConnection("mysql", conn);
+				
+				if(null != rs){
+					rs.close();
+				}else if (null != stat) {
+					stat.close();
+				}else if(null != conn){
+					conn.close();
+				}
 			} catch (Exception e2) {
 				e2.printStackTrace();
 				logger.error("释放数据库连接出错",e2);
@@ -207,7 +215,7 @@ public class MysqlService {
 		ResultSet rs = null;
 		try {
 			String memberSql = "select NAME,MOBILE from USER where USER_ID  = '"+member+"'";
-			conn = MysqlConnection.getConnection();
+			conn = MysqlPoolManager.getInstance().getConnection("mysql"); 
 			stat = conn.createStatement();
 			rs = stat.executeQuery(memberSql);
 			while(rs.next()){
@@ -222,7 +230,15 @@ public class MysqlService {
 			logger.info("获取会员信息异常",e);
 		} finally {
 			try {
-				MysqlConnection.releaseResources(conn, stat, rs);
+                MysqlPoolManager.getInstance().freeConnection("mysql", conn);
+				
+				if(null != rs){
+					rs.close();
+				}else if (null != stat) {
+					stat.close();
+				}else if(null != conn){
+					conn.close();
+				}
 			} catch (Exception e2) {
 				e2.printStackTrace();
 				logger.error("释放数据库连接出错",e2);
