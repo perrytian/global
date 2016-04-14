@@ -18,12 +18,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.xiangmei.uthink.object.Customer;
 import com.xiangmei.uthink.object.SaleRecord;
+import com.xiangmei.uthink.object.SalesDetail;
 
 public class MysqlService {
 	
 	private static Logger logger = Logger.getLogger(MysqlService.class);  
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
+	private SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");
 	public static List<Customer> customersInfo(){
 		List<Customer> customerList = new ArrayList<Customer>();
 		Connection conn = null;
@@ -259,6 +260,138 @@ public class MysqlService {
 
 		return null;
 	}
+	
+	private static String parseProduct(String procuctInfo) {
+		String result = null;
+		try {
+			if (null!=procuctInfo) {
+				result = procuctInfo.substring(procuctInfo.lastIndexOf("(")+1,procuctInfo.lastIndexOf(")"));
+			}else{
+				logger.info("procuctInfo为空:"+procuctInfo);
+			}
+				
+			
+		} catch (Exception e) {
+			logger.error("解析产品异常:"+result);
+		}
+		return result;
+
+	}
+	
+	
+	public List<SalesDetail> getSalesRecordeDetail(){
+		List<SalesDetail> saleList = new ArrayList<>();
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+			String saleRecordeSql = "SELECT * FROM sales_recorde_detail_03";
+			//String saleRecordeSql = "select * from sales_recorde where id = '1'";
+			conn = MysqlPoolManager.getInstance().getConnection("mysql"); 
+			stat = conn.createStatement();
+			rs = stat.executeQuery(saleRecordeSql);
+			
+			String temDate = null;
+			while(rs.next()){
+				
+				String dateTime = rs.getString("DATE_TIME");
+
+				String dateString;
+				if(null==dateTime||"null".equals(dateTime)||dateTime.isEmpty()){
+					dateString =temDate;
+				}else{
+					dateString = sdfDate.format(sdf.parse(dateTime));
+					temDate = dateString;
+				}
+				String productInfo = rs.getString("PRODUCT_INFO");
+				if("-".equals(productInfo) || "抹零".equals(productInfo)){
+					continue;
+				}
+				String productCode = parseProduct(productInfo);
+				if (null==productCode) {
+					continue;
+				}
+				String productNumber = rs.getString("PRODUCT_NUMBER");
+				SalesDetail volume = new SalesDetail();
+				volume.setDateString(dateString);
+				volume.setProduct(productCode);
+				volume.setVolume(Float.parseFloat(productNumber));
+				//System.out.println("销售详情:Product["+productCode+"]Volume["+productNumber+"]Date["+dateString+"]");
+				saleList.add(volume);
+			}
+			
+			System.out.println("saleList大小:"+saleList.size());
+		} catch (Exception e) {
+			logger.error("获取销售记录异常",e);
+		} finally {
+			try {
+				MysqlPoolManager.getInstance().freeConnection("mysql", conn);
+				
+				if(null != rs){
+					rs.close();
+				}else if (null != stat) {
+					stat.close();
+				}else if(null != conn){
+					conn.close();
+				}
+			} catch (Exception e2) {
+				e2.printStackTrace();
+				logger.error("释放数据库连接出错",e2);
+			}
+		}
+		
+		return saleList;
+	}
+	
+	
+	public void salesVolumeMysql(List<SalesDetail> salesVolume){
+		
+		Connection conn = null;
+		Statement stat = null;
+		ResultSet rs = null;
+		try {
+			conn = MysqlPoolManager.getInstance().getConnection("mysql"); 
+			stat = conn.createStatement();
+			for (int i = 0; i < salesVolume.size(); i++) {
+				
+				SalesDetail volume = salesVolume.get(i);
+				String productExistSql = "select * from sales_volume where PRODUCT = '"+volume.getProduct()+"' AND SALES_DATE = '"+volume.getDateString()+"' ";
+				//System.out.println("sql:"+productExistSql);
+				rs = stat.executeQuery(productExistSql);
+				if (rs.next()) {
+					double addVolume = rs.getDouble("SALES_VOLUME")+volume.getVolume();
+					String updateSql = "update sales_volume set SALES_VOLUME = '"+addVolume+"' WHERE PRODUCT = '"+volume.getProduct()+"' AND SALES_DATE = '"+volume.getDateString()+"'";
+					int updateResult = stat.executeUpdate(updateSql);
+					//System.out.println("update result:"+updateResult+"PRODUCT["+volume.getProduct()+"]VOLUME["+volume.getVolume()+"]DATE["+volume.getDateString()+"]");
+				}else {
+					String pruductInsert = "Insert into sales_volume(PRODUCT,SALES_VOLUME,SALES_DATE) VALUES('"+volume.getProduct()+"','"+volume.getVolume()+"','"+volume.getDateString()+"')";
+					int insertResult =stat.executeUpdate(pruductInsert);
+					//System.out.println("insert result:"+insertResult+"PRODUCT["+volume.getProduct()+"]VOLUME["+volume.getVolume()+"]DATE["+volume.getDateString()+"]");
+				}
+			}
+			
+		} catch (Exception e) {
+			logger.info("获取销售记录异常",e);
+		} finally {
+			try {
+				MysqlPoolManager.getInstance().freeConnection("mysql", conn);
+				
+				if(null != rs){
+					rs.close();
+				}else if (null != stat) {
+					stat.close();
+				}else if(null != conn){
+					conn.close();
+				}
+			} catch (Exception e2) {
+				e2.printStackTrace();
+				logger.error("释放数据库连接出错",e2);
+			}
+		}
+		
+	}
+	
+	
 	public static void main(String[] args) {
 		List<Customer> list = MysqlService.birthdayInfo();
 		for (int i = 0; i < list.size(); i++) {
